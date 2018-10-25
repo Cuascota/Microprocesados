@@ -6,7 +6,6 @@ void setup() {
   // put your setup code here, to run once:
 for(i=0;i<6;i++){
  pinMode(leds[i],OUTPUT);
- randomSeed(analogRead(0));
  }
  i=0; // reseteo la variable de conteo
  
