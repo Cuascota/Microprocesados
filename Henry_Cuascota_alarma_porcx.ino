@@ -7,93 +7,73 @@
  *  TEMA: RELOG Y ALARMA INGRESADA POR COMUNICACION SERIAL
  * 
  */
-#include <TimerOne.h>
+#include <MsTimer2.h>
 #include <LiquidCrystal.h>
 LiquidCrystal lcd(13,12,11,10,9,8); 
 int Sec = 0;
 int Min = 0;
 int Hor = 0;
-
 int buzzer=6;
-int ha=0;
-int ma=10;
-char texto[10];
+int modo=0;
 
-int segundos=0;
-int hora_alarma=0;
-int minutos_alarma1=0;
-char lectura_hora;
-char  lectura_minutos;
-boolean alarmaOn=false;
-int contador_alarma=0;
-
-boolean actualizar=true;
-boolean alarma= false;
+int hora_alarma;
+int minutos_alarma1;
+String lectura_hora;
+String  lectura_minutos;
+int contador_alarma;
 
 void setup() {
   // put your setup code here, to run once:
   lcd.begin(16, 2);
   Serial.begin(9600);
-  Timer1.initialize(1000000);
-Timer1.attachInterrupt(contador);
-  pinMode(buzzer, OUTPUT);
+    MsTimer2::set(1000,contador); // metodo para el timer
+  MsTimer2::start();//Inicializamos timer
+pinMode(3,INPUT);
+pinMode(2,INPUT);
+pinMode(buzzer, OUTPUT);
 }
 
 void loop() {
-   if (Serial.available() > 0) {
-    while (Serial.available() > 0) {
-             
-      lectura_hora = Serial.read(); //leer palabras
-      hora_alarma+= lectura_hora;
+  if(digitalRead(3)== LOW){
+   Hor++;
+   delay(300);
+  }
+  if(digitalRead(2)== LOW){
+   Min++; 
+   delay(300);
+  }
+
+   if (Serial.available() > 0) {   
+      lectura_hora = Serial.readString(); //leer palabras
+      hora_alarma = lectura_hora.toInt();
       
      Serial.println(hora_alarma);
-    }
-    while (Serial.available() > 0) {
-      lectura_minutos = Serial.read(); //leer palabras
-      minutos_alarma1 += lectura_minutos;
-     
+     modo++;
+    delay(400); 
+     if (modo==1){
+      Serial.println("Ing Minutos:");
+      lectura_minutos = Serial.readString(); //leer palabras
+      minutos_alarma1 = lectura_minutos.toInt();
       Serial.println(minutos_alarma1);
+      modo=0;
   }
-  }
-if(actualizar == true){
-    lcd.setCursor(0, 1);
-    //ALARMA
-    lcd.print(hora_alarma);
-    lcd.setCursor(2, 1);
-    lcd.print(":");
-    lcd.setCursor(3, 1);
-    lcd.print(minutos_alarma1);
-    lcd.setCursor(5, 1);
-    lcd.print(":");
-    lcd.setCursor(8, 1);
-    lcd.print("  ALARMA");
-    lcd.setCursor(0,1);
-   
-  if(alarma ==true){
-      if(Sec==0 && Hor == hora_alarma && Min == minutos_alarma1){
+  } 
+      if(Hor == hora_alarma  && Min == minutos_alarma1){
+        contador_alarma++;
         digitalWrite(buzzer, HIGH);
-      }
-    }else{
-       digitalWrite(buzzer, LOW);
+      }  
+   else{
+     digitalWrite(buzzer, LOW); 
     }
+
     if(contador_alarma==60){
       digitalWrite(buzzer, LOW);
       contador_alarma=0;
     }
-  actualizar = false;
 }
-}  
-  
 
 void contador()
-{
-  segundos++;
-    
-    if(digitalRead(buzzer)==HIGH){
-    contador_alarma++;
-    }
-    actualizar=true;
-    
+{ 
     lcd.clear();
   if(Hor<10){
 
@@ -151,4 +131,26 @@ void contador()
       Sec=0;
       
       }
+      if(hora_alarma<10){
+        lcd.setCursor(0, 1);
+        lcd.print(0);
+        lcd.setCursor(1,1);
+        lcd.print(hora_alarma);
+      }else{
+    lcd.setCursor(0,1);
+    lcd.print(hora_alarma);
+  }
+   lcd.setCursor(2, 1);                                       // posiscion para imprimir valor
+    lcd.print(":"); 
+
+     if(minutos_alarma1<10){
+        lcd.setCursor(3, 1);
+        lcd.print(0);
+        lcd.setCursor(4,1);
+        lcd.print(minutos_alarma1);
+      }else{
+    lcd.setCursor(3,1);
+    lcd.print(minutos_alarma1);
+  }
+  
   }
