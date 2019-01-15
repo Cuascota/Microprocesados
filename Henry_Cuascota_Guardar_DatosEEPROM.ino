@@ -9,9 +9,6 @@ int modo=0;   // variable para cambiar de estado al ingresar un numero
 void setup() {
   Serial.begin(9600); // inicializamos comunicacion serial
   Serial.println("    INGRESE PRIMER NUMERO A COMPROBAR:   "); // Mensaje de inicio
- /* EEPROM.write(2, 0);
-  delay(10);
-  Serial.println(EEPROM.read(0),HEX);*/
 }
 
 void loop() {
