@@ -1,6 +1,7 @@
 #include <TimerOne.h>
 #include <LowPower.h> //Librería modos sleep
-#include <avr/power.h> //Librería deshabilitar perifericos
+#include<avr/sleep.h>
+#include<avr/power.h>
 
 #include <LiquidCrystal.h>
 LiquidCrystal lcd(13,12,11,10,9,8); 
@@ -12,10 +13,13 @@ void setup() {
   // put your setup code here, to run once:
   lcd.begin(16, 2);
   Serial.begin(9600);
+   set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+  sleep_enable();
   Timer1.initialize(1000000);
 Timer1.attachInterrupt(contador);
 pinMode(3,INPUT);
 pinMode(2,INPUT);
+power_all_disable(); //Deshabilita todos los módulos
 }
 
 void loop() {
@@ -96,5 +100,10 @@ void contador()
       Sec=0;
       
       }
+
+      
+     delay(250);// tiempo de espera
+      LowPower.powerDown(SLEEP_500MS, ADC_OFF, BOD_OFF); // con el delay y el sleep cada 5000ms 
+      // el programa se duerme cada 5ms y se despierta 
  
   }
